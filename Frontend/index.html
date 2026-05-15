@@ -34,7 +34,7 @@
       <h2>Create Account</h2>
       <p class="subtitle">Join us to register and track your complaints.</p>
 
-      <form id="form-send-otp" class="animated-form">
+      <form id="form-register" class="animated-form">
         <div class="input-group">
           <label>Full Name</label>
           <input type="text" id="reg-name" required placeholder="John Doe" />
@@ -43,21 +43,6 @@
           <label>Email Address</label>
           <input type="email" id="reg-email" required placeholder="john@example.com" />
         </div>
-        <button type="submit" class="btn primary-btn">Send OTP</button>
-        <p class="switch-auth">Already have an account? <a href="#" onclick="router('login'); return false;">Log in</a>
-        </p>
-      </form>
-
-      <form id="form-verify-otp" class="animated-form hidden">
-        <p class="info-text">We sent a code to your email.</p>
-        <div class="input-group">
-          <label>Enter OTP</label>
-          <input type="text" id="reg-otp" required placeholder="123456" />
-        </div>
-        <button type="button" id="btn-verify-otp" class="btn primary-btn">Verify</button>
-      </form>
-
-      <form id="form-setup-pwd" class="animated-form hidden">
         <div class="input-group">
           <label>Password</label>
           <input type="password" id="reg-password" required placeholder="••••••••" />
@@ -66,7 +51,9 @@
           <label>Confirm Password</label>
           <input type="password" id="reg-confirm-password" required placeholder="••••••••" />
         </div>
-        <button type="submit" class="btn primary-btn">Complete Registration</button>
+        <button type="submit" class="btn primary-btn">Register</button>
+        <p class="switch-auth">Already have an account? <a href="#" onclick="router('login'); return false;">Log in</a>
+        </p>
       </form>
     </div>
   </template>

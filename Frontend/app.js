@@ -108,44 +108,16 @@ const router = async (route) => {
 
 const attachListeners = (route) => {
   if (route === 'register') {
-    document.getElementById('form-send-otp').addEventListener('submit', async (e) => {
+    document.getElementById('form-register').addEventListener('submit', async (e) => {
       e.preventDefault();
       const name = document.getElementById('reg-name').value;
-      regEmail = document.getElementById('reg-email').value;
-
-      const btn = e.target.querySelector('button');
-      btn.textContent = 'Sending...';
-      btn.disabled = true;
-
-      try {
-        await apiFetch('/auth/send-otp', {
-          method: 'POST',
-          body: JSON.stringify({ name, email: regEmail })
-        });
-        document.getElementById('form-send-otp').classList.add('hidden');
-        document.getElementById('form-verify-otp').classList.remove('hidden');
-        showToast('OTP sent to email', 'success');
-      } catch (err) {
-        showToast(err.message);
-        btn.textContent = 'Send OTP';
-        btn.disabled = false;
-      }
-    });
-
-    document.getElementById('btn-verify-otp').addEventListener('click', () => {
-      const otp = document.getElementById('reg-otp').value;
-      if (!otp) return showToast('Please enter OTP');
-      document.getElementById('form-verify-otp').classList.add('hidden');
-      document.getElementById('form-setup-pwd').classList.remove('hidden');
-    });
-
-    document.getElementById('form-setup-pwd').addEventListener('submit', async (e) => {
-      e.preventDefault();
+      const email = document.getElementById('reg-email').value;
       const password = document.getElementById('reg-password').value;
-      const confirm = document.getElementById('reg-confirm-password').value;
-      const otp = document.getElementById('reg-otp').value;
+      const confirmPassword = document.getElementById('reg-confirm-password').value;
 
-      if (password !== confirm) return showToast('Passwords do not match');
+      if (password !== confirmPassword) {
+        return showToast('Passwords do not match');
+      }
 
       const btn = e.target.querySelector('button');
       btn.textContent = 'Registering...';
@@ -154,13 +126,13 @@ const attachListeners = (route) => {
       try {
         await apiFetch('/auth/register', {
           method: 'POST',
-          body: JSON.stringify({ email: regEmail, otp, password })
+          body: JSON.stringify({ name, email, password, confirmPassword })
         });
         showToast('Registration successful!', 'success');
         router('login');
       } catch (err) {
         showToast(err.message);
-        btn.textContent = 'Complete Registration';
+        btn.textContent = 'Register';
         btn.disabled = false;
       }
     });

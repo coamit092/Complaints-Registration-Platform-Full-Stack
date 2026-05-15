@@ -1,6 +1,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
+const bcrypt = require('bcryptjs');
 const db = require('../db');
 const { users } = require('../db/schema');
 const { eq } = require('drizzle-orm');
@@ -8,81 +8,35 @@ const { authMiddleware } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_PASS,
-  },
-});
+router.post('/register', async (req, res) => {
+  const { name, email, password, confirmPassword } = req.body;
+  
+  if (!name || !email || !password || !confirmPassword) {
+    return res.status(400).json({ error: 'All fields are required' });
+  }
 
-router.post('/send-otp', async (req, res) => {
-  const { name, email } = req.body;
-  console.log(`[Send-OTP] Request for: ${email}`);
-  if (!name || !email) return res.status(400).json({ error: 'Name and email are required' });
+  if (password !== confirmPassword) {
+    return res.status(400).json({ error: 'Passwords do not match' });
+  }
 
   try {
     const existingUser = await db.select().from(users).where(eq(users.email, email));
-    if (existingUser.length > 0 && existingUser[0].is_verified) {
-      console.log(`[Send-OTP] Email already registered: ${email}`);
+    if (existingUser.length > 0) {
       return res.status(400).json({ error: 'Email already registered' });
     }
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const otp_expiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    console.log(`[Send-OTP] Saving OTP to DB for: ${email}`);
-    if (existingUser.length > 0) {
-      await db.update(users).set({ otp, otp_expiry, name }).where(eq(users.email, email));
-    } else {
-      await db.insert(users).values({ name, email, otp, otp_expiry, is_verified: false });
-    }
-
-    console.log(`[Send-OTP] Sending mail to: ${email}. Generated OTP: ${otp}`);
-    try {
-      await transporter.sendMail({
-        from: process.env.GMAIL_USER,
-        to: email,
-        subject: 'Your OTP',
-        text: `Your OTP is ${otp}. It expires in 10 minutes.`,
-      });
-      console.log(`[Send-OTP] Mail sent successfully to: ${email}`);
-      res.json({ message: 'OTP sent successfully' });
-    } catch (mailErr) {
-      console.error('[Send-OTP] Nodemailer Error:', mailErr);
-      res.status(500).json({ error: `Mail service error: ${mailErr.message}` });
-    }
-
-  } catch (dbErr) {
-    console.error('[Send-OTP] Database Error:', dbErr);
-    res.status(500).json({ error: `Database error: ${dbErr.message}` });
-  }
-});
-
-router.post('/register', async (req, res) => {
-  const { email, otp, password } = req.body;
-  if (!email || !otp || !password) return res.status(400).json({ error: 'Missing fields' });
-
-  try {
-    const userRecords = await db.select().from(users).where(eq(users.email, email));
-    if (userRecords.length === 0) return res.status(404).json({ error: 'User not found' });
-
-    const user = userRecords[0];
-    if (user.otp !== otp) return res.status(400).json({ error: 'Invalid OTP' });
-    if (new Date() > new Date(user.otp_expiry)) return res.status(400).json({ error: 'OTP expired' });
-
-    await db.update(users).set({ 
-      password, // Plain text as requested
-      is_verified: true, 
-      otp: null, 
-      otp_expiry: null 
-    }).where(eq(users.email, email));
+    await db.insert(users).values({ 
+      name, 
+      email, 
+      password: hashedPassword,
+      is_verified: true 
+    });
 
     res.json({ message: 'Registration successful' });
   } catch (err) {
-    console.error(err);
+    console.error('[Register] Error:', err);
     res.status(500).json({ error: 'Error registering user' });
   }
 });
@@ -100,12 +54,9 @@ router.post('/login', async (req, res) => {
     }
 
     const user = userRecords[0];
-    if (!user.is_verified) {
-      console.log(`User not verified: ${email}`);
-      return res.status(401).json({ error: 'User not verified' });
-    }
     
-    if (user.password !== password) {
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
       console.log(`Invalid password for: ${email}`);
       return res.status(401).json({ error: 'Invalid credentials' });
     }

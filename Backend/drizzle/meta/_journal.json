@@ -8,6 +8,13 @@
       "when": 1778829313846,
       "tag": "0000_wise_steel_serpent",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1778848621689,
+      "tag": "0001_flowery_orphan",
+      "breakpoints": true
     }
   ]
 }
