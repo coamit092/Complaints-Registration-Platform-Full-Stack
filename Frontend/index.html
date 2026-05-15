@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Complaints Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div id="app">
+    <nav class="navbar">
+      <div class="logo">Complaints Registration Platform</div>
+      <div class="nav-links" id="navLinks">
+        <!-- Links will be injected by JS -->
+      </div>
+    </nav>
+
+    <div class="main-container">
+      <div id="error-toast" class="toast hidden"></div>
+      <div id="success-toast" class="toast success hidden"></div>
+
+      <main id="content">
+        <!-- Views will be injected here -->
+      </main>
+    </div>
+  </div>
+
+  <!-- Templates -->
+  <template id="tpl-register">
+    <div class="auth-card glass-panel">
+      <h2>Create Account</h2>
+      <p class="subtitle">Join us to register and track your complaints.</p>
+
+      <form id="form-send-otp" class="animated-form">
+        <div class="input-group">
+          <label>Full Name</label>
+          <input type="text" id="reg-name" required placeholder="John Doe" />
+        </div>
+        <div class="input-group">
+          <label>Email Address</label>
+          <input type="email" id="reg-email" required placeholder="john@example.com" />
+        </div>
+        <button type="submit" class="btn primary-btn">Send OTP</button>
+        <p class="switch-auth">Already have an account? <a href="#" onclick="router('login'); return false;">Log in</a>
+        </p>
+      </form>
+
+      <form id="form-verify-otp" class="animated-form hidden">
+        <p class="info-text">We sent a code to your email.</p>
+        <div class="input-group">
+          <label>Enter OTP</label>
+          <input type="text" id="reg-otp" required placeholder="123456" />
+        </div>
+        <button type="button" id="btn-verify-otp" class="btn primary-btn">Verify</button>
+      </form>
+
+      <form id="form-setup-pwd" class="animated-form hidden">
+        <div class="input-group">
+          <label>Password</label>
+          <input type="password" id="reg-password" required placeholder="••••••••" />
+        </div>
+        <div class="input-group">
+          <label>Confirm Password</label>
+          <input type="password" id="reg-confirm-password" required placeholder="••••••••" />
+        </div>
+        <button type="submit" class="btn primary-btn">Complete Registration</button>
+      </form>
+    </div>
+  </template>
+
+  <template id="tpl-login">
+    <div class="auth-card glass-panel">
+      <h2>Welcome Back</h2>
+      <p class="subtitle">Log in to manage your complaints.</p>
+      <form id="form-login" class="animated-form">
+        <div class="input-group">
+          <label>Email</label>
+          <input type="email" id="login-email" required placeholder="john@example.com" />
+        </div>
+        <div class="input-group">
+          <label>Password</label>
+          <input type="password" id="login-password" required placeholder="••••••••" />
+        </div>
+        <button type="submit" class="btn primary-btn">Log In</button>
+        <p class="switch-auth">Don't have an account? <a href="#"
+            onclick="router('register'); return false;">Register</a></p>
+      </form>
+    </div>
+  </template>
+
+  <template id="tpl-submit-complaint">
+    <div class="dashboard-panel glass-panel">
+      <h2>Submit a Complaint</h2>
+      <div class="form-step" id="step-complaint">
+        <div class="input-group">
+          <label>Describe your issue in detail</label>
+          <textarea id="complaint-text" rows="5" placeholder="I am facing an issue with..." required></textarea>
+        </div>
+        <button id="btn-get-ai" class="btn primary-btn ai-btn">
+          <span class="sparkle">✨</span> Get AI Follow-up
+        </button>
+      </div>
+
+      <div class="form-step hidden" id="step-ai">
+        <div class="ai-box">
+          <span class="sparkle">✨</span>
+          <p id="ai-question-text" class="ai-question"></p>
+        </div>
+        <div class="input-group mt-4">
+          <label>Your Answer</label>
+          <textarea id="user-answer" rows="3" placeholder="My answer is..." required></textarea>
+        </div>
+        <button id="btn-submit-final" class="btn success-btn">Submit Complaint</button>
+      </div>
+    </div>
+  </template>
+
+  <template id="tpl-my-complaints">
+    <div class="dashboard-header">
+      <h2>My Complaints</h2>
+      <button class="btn primary-btn" onclick="router('submit-complaint')">+ New Complaint</button>
+    </div>
+    <div id="complaints-list" class="complaints-grid">
+      <!-- Injected -->
+    </div>
+  </template>
+
+  <template id="tpl-admin-dashboard">
+    <div class="dashboard-header">
+      <h2>Admin Dashboard</h2>
+      <p>All complaints across the platform</p>
+    </div>
+    <div id="admin-complaints-list" class="complaints-grid">
+      <!-- Injected -->
+    </div>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+
+</html>
