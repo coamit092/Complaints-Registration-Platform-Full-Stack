@@ -9,7 +9,12 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL ? [process.env.FRONTEND_URL, 'http://localhost:5500', 'http://127.0.0.1:5500'] : true,
+  origin: [
+    process.env.FRONTEND_URL,
+    'https://coamit092.github.io',
+    'http://localhost:5500',
+    'http://127.0.0.1:5500'
+  ].filter(Boolean),
   credentials: true,
 }));
 app.use(express.json());

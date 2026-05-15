@@ -111,10 +111,11 @@ router.post('/login', async (req, res) => {
     }
 
     const token = jwt.sign({ id: user.id, email: user.email, role: user.role, name: user.name }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '1d' });
+    const isProduction = process.env.NODE_ENV === 'production' || req.headers.host.includes('onrender.com');
     res.cookie('token', token, { 
-      httpOnly: false, 
-      secure: false, 
-      sameSite: 'Lax',
+      httpOnly: true, 
+      secure: isProduction, 
+      sameSite: isProduction ? 'None' : 'Lax',
       path: '/',
       maxAge: 24 * 60 * 60 * 1000 // 1 day
     });
