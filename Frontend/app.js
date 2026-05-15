@@ -1,4 +1,4 @@
-const BACKEND_BASE_URL = 'http://localhost:3000';
+const BACKEND_BASE_URL = 'https://complaints-registration-platform-full-aohd.onrender.com';
 const API_BASE = `${BACKEND_BASE_URL}/api`;
 let currentUser = null;
 
@@ -51,7 +51,7 @@ const apiFetch = async (endpoint, options = {}) => {
   if (token) {
     options.headers['Authorization'] = `Bearer ${token}`;
   }
-  
+
   const res = await fetch(`${API_BASE}${endpoint}`, options);
   const data = await res.json();
   if (!res.ok) {
@@ -85,7 +85,7 @@ const logout = async () => {
 const router = async (route) => {
   const content = document.getElementById('content');
   content.innerHTML = '';
-  
+
   if (route !== 'login' && route !== 'register') {
     if (!currentUser) {
       await checkSession();
@@ -110,7 +110,7 @@ const attachListeners = (route) => {
       e.preventDefault();
       const name = document.getElementById('reg-name').value;
       regEmail = document.getElementById('reg-email').value;
-      
+
       const btn = e.target.querySelector('button');
       btn.textContent = 'Sending...';
       btn.disabled = true;
@@ -214,7 +214,7 @@ const attachListeners = (route) => {
         });
         aiQuestionTemp = res.ai_question;
         document.getElementById('ai-question-text').textContent = aiQuestionTemp;
-        
+
         document.getElementById('step-complaint').classList.add('hidden');
         document.getElementById('step-ai').classList.remove('hidden');
       } catch (err) {
@@ -268,7 +268,7 @@ const fetchMyComplaints = async () => {
       container.innerHTML = '<p class="text-muted">You have not submitted any complaints yet.</p>';
       return;
     }
-    
+
     container.innerHTML = complaints.map(c => `
       <div class="complaint-card">
         <div class="c-meta">
@@ -303,7 +303,7 @@ const fetchAdminComplaints = async () => {
       container.innerHTML = '<p class="text-muted">No complaints found.</p>';
       return;
     }
-    
+
     container.innerHTML = complaints.map(c => `
       <div class="complaint-card">
         <div class="c-meta" style="flex-direction:column;gap:4px;">
