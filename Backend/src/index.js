@@ -12,6 +12,7 @@ app.use(cors({
   origin: [
     process.env.FRONTEND_URL,
     'https://coamit092.github.io',
+    'https://amit.jyotiai.shop',
     'http://localhost:5500',
     'http://127.0.0.1:5500'
   ].filter(Boolean),
