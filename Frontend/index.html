@@ -41,17 +41,27 @@
         </div>
         <div class="input-group">
           <label>Email Address</label>
-          <input type="email" id="reg-email" required placeholder="john@example.com" />
+          <div style="display: flex; gap: 8px;">
+            <input type="email" id="reg-email" required placeholder="john@example.com" style="flex: 1;" />
+            <button type="button" id="btn-send-otp" class="btn primary-btn" style="width: auto; padding: 0.75rem 1.25rem; white-space: nowrap;">Send OTP</button>
+          </div>
         </div>
-        <div class="input-group">
+        <div class="input-group hidden" id="otp-group">
+          <label>OTP</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="reg-otp" placeholder="123456" style="flex: 1;" />
+            <button type="button" id="btn-verify-otp" class="btn success-btn" style="width: auto; padding: 0.75rem 1.25rem; white-space: nowrap;">Verify OTP</button>
+          </div>
+        </div>
+        <div class="input-group hidden" id="password-group">
           <label>Password</label>
-          <input type="password" id="reg-password" required placeholder="••••••••" />
+          <input type="password" id="reg-password" placeholder="••••••••" />
         </div>
-        <div class="input-group">
+        <div class="input-group hidden" id="confirm-password-group">
           <label>Confirm Password</label>
-          <input type="password" id="reg-confirm-password" required placeholder="••••••••" />
+          <input type="password" id="reg-confirm-password" placeholder="••••••••" />
         </div>
-        <button type="submit" class="btn primary-btn">Register</button>
+        <button type="submit" id="btn-register" class="btn primary-btn hidden">Register</button>
         <p class="switch-auth">Already have an account? <a href="#" onclick="router('login'); return false;">Log in</a>
         </p>
       </form>

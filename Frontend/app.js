@@ -1,4 +1,4 @@
-const BACKEND_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+const BACKEND_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:'
   ? 'http://localhost:3000'
   : 'https://complaints-registration-platform-full-aohd.onrender.com';
 const API_BASE = `${BACKEND_BASE_URL}/api`;
@@ -108,10 +108,76 @@ const router = async (route) => {
 
 const attachListeners = (route) => {
   if (route === 'register') {
+    document.getElementById('btn-send-otp').addEventListener('click', async () => {
+      const email = document.getElementById('reg-email').value;
+      if (!email) return showToast('Please enter your email first.');
+
+      const btn = document.getElementById('btn-send-otp');
+      const originalText = btn.textContent;
+      btn.textContent = 'Sending...';
+      btn.disabled = true;
+
+      try {
+        await apiFetch('/auth/send-otp', {
+          method: 'POST',
+          body: JSON.stringify({ email })
+        });
+        showToast('OTP sent to your email!', 'success');
+        document.getElementById('otp-group').classList.remove('hidden');
+        document.getElementById('reg-otp').setAttribute('required', 'true');
+      } catch (err) {
+        showToast(err.message);
+      } finally {
+        btn.textContent = originalText;
+        btn.disabled = false;
+      }
+    });
+
+    document.getElementById('btn-verify-otp').addEventListener('click', async () => {
+      const email = document.getElementById('reg-email').value;
+      const otp = document.getElementById('reg-otp').value;
+      if (!email) return showToast('Please enter your email.');
+      if (!otp) return showToast('Please enter the OTP.');
+
+      const btn = document.getElementById('btn-verify-otp');
+      const originalText = btn.textContent;
+      btn.textContent = 'Verifying...';
+      btn.disabled = true;
+
+      try {
+        await apiFetch('/auth/verify-otp', {
+          method: 'POST',
+          body: JSON.stringify({ email, otp })
+        });
+        showToast('OTP verified successfully!', 'success');
+        
+        // Hide/Disable OTP elements
+        btn.textContent = 'Verified!';
+        btn.disabled = true;
+        document.getElementById('reg-otp').disabled = true;
+        document.getElementById('reg-email').disabled = true;
+        document.getElementById('reg-name').disabled = true;
+        document.getElementById('btn-send-otp').disabled = true;
+
+        // Show password fields and Register button
+        document.getElementById('password-group').classList.remove('hidden');
+        document.getElementById('confirm-password-group').classList.remove('hidden');
+        document.getElementById('btn-register').classList.remove('hidden');
+        
+        document.getElementById('reg-password').setAttribute('required', 'true');
+        document.getElementById('reg-confirm-password').setAttribute('required', 'true');
+      } catch (err) {
+        showToast(err.message);
+        btn.textContent = originalText;
+        btn.disabled = false;
+      }
+    });
+
     document.getElementById('form-register').addEventListener('submit', async (e) => {
       e.preventDefault();
       const name = document.getElementById('reg-name').value;
       const email = document.getElementById('reg-email').value;
+      const otp = document.getElementById('reg-otp').value;
       const password = document.getElementById('reg-password').value;
       const confirmPassword = document.getElementById('reg-confirm-password').value;
 
@@ -119,14 +185,14 @@ const attachListeners = (route) => {
         return showToast('Passwords do not match');
       }
 
-      const btn = e.target.querySelector('button');
+      const btn = e.target.querySelector('button[type="submit"]');
       btn.textContent = 'Registering...';
       btn.disabled = true;
 
       try {
         await apiFetch('/auth/register', {
           method: 'POST',
-          body: JSON.stringify({ name, email, password, confirmPassword })
+          body: JSON.stringify({ name, email, otp, password, confirmPassword })
         });
         showToast('Registration successful!', 'success');
         router('login');
